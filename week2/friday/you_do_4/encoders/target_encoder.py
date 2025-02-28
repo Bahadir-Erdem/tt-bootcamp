@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.model_selection import KFold, train_test_split
 from typing import Any, List, Union, Literal, Optional, Protocol, runtime_checkable
+from sktime.split.base import BaseSplitter
 
 
 @runtime_checkable
@@ -78,6 +79,7 @@ class TargetEncoder:
         self.columns = self._get_column_names_to_process(X)
         self.TARGET = y.columns[0]
         fold = self._get_fold()
+        splitter = self._get_splitter(X, y, fold)
 
         for column in self.columns:
             if column not in X.columns:
@@ -85,7 +87,7 @@ class TargetEncoder:
 
             encodings = [
                 self._generate_encodings(X.iloc[train_idx], y.iloc[train_idx], column)
-                for train_idx, _ in fold.split(X, y)
+                for train_idx, _ in splitter
             ]
 
             self.mappings[column] = self._calculate_weighted_means_of_encodings(
@@ -93,6 +95,14 @@ class TargetEncoder:
             )
 
         return self
+
+    def _get_splitter(
+        self,
+        X: Optional[pd.DataFrame],
+        y: pd.DataFrame,
+        fold: FoldProtocol,
+    ):
+        return fold.split(y) if isinstance(fold, BaseSplitter) else fold.split(X, y)
 
     def _generate_encodings(
         self, X_train_fold: pd.DataFrame, y_train_fold, column: str
