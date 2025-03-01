@@ -172,20 +172,3 @@ def get_data(address: str, target: str, SEED: int):
     y = auto_df.loc[:, auto_df.columns == target]
 
     return train_test_split(X, y, test_size=0.2, random_state=SEED)
-
-
-def main():
-    address = "dataset/autos.csv"
-    SEED = 76
-    TARGET = "price"
-
-    X_train, X_test, y_train, y_test = get_data(address, TARGET, SEED)
-    
-    te = TargetEncoder()
-    te.fit(X_train, y_train)
-    print(te.transform(X_train))
-    print(te.transform(X_test))
-
-
-if __name__ == "__main__":
-    main()
