@@ -79,9 +79,10 @@ class TargetEncoder:
         self.columns = self._get_column_names_to_process(X)
         self.TARGET = y.columns[0]
         fold = self._get_fold()
-        splitter = self._get_splitter(X, y, fold)
 
         for column in self.columns:
+            splitter = self._get_splitter(X, y, fold)
+
             if column not in X.columns:
                 raise ValueError(f"Column '{column}' not found in X")
 
